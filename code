@@ -1,0 +1,160 @@
+import java.util.*;
+
+class InsufficientBalanceException extends Exception {
+    public InsufficientBalanceException(String message) {
+        super(message);
+    }
+}
+
+class BankAccount {
+    private int balance;
+    private int prevTransaction;
+    private String name;
+    final private String id;
+    private ArrayList<String> transactionHistory = new ArrayList<>();
+
+    BankAccount(String name, String id) { // Constructor
+        this.name = name;
+        this.id = id;
+    }
+
+    public int getBalance() {
+        return balance;
+    }
+
+    public void deposit(int amount) {
+        if(amount <= 0) {
+            System.out.println("Amount must be greater than zero......");
+            return;
+        }
+        balance += amount;
+        prevTransaction = amount;
+        transactionHistory.add("Deposited : " + amount);
+    }
+
+    public void withdraw(int amount) throws InsufficientBalanceException {
+        if(amount <= 0) {
+            System.out.println("Amount must be greater than zero......");
+            return;
+        }
+        if(amount > balance){
+            throw new InsufficientBalanceException("Insufficient Balance! Withdrawal failed.");
+        }
+        balance -= amount;
+        prevTransaction = (-amount);
+        transactionHistory.add("Withdrawn : " + amount);
+    }
+
+    public void prevTransaction() {
+        if(prevTransaction > 0) {
+            System.out.println("deposit amount = " + prevTransaction);
+        } else if(prevTransaction < 0) {
+            System.out.println("withdraw amount = " + Math.abs(prevTransaction));
+        } else {
+            System.out.println("No Transaction occurred");
+        }
+    }
+
+    public void showTransactionHistory() {
+        if(transactionHistory.isEmpty()){
+            System.out.println("No transactions yet.");
+            return;
+        }
+        for(int i = 0; i < transactionHistory.size(); i++) {
+            System.out.println((i+1) + "." + transactionHistory.get(i));
+        }
+    }
+
+    public void showMenu() {
+        System.out.println("Hi " + name);
+        System.out.println("Your id is = " + id);
+        System.out.println();
+
+        System.out.println("A. Balance");
+        System.out.println("B. Deposit");
+        System.out.println("C. Withdraw");
+        System.out.println("D. Previous Transaction");
+        System.out.println("E. Show Transaction History");
+        System.out.println("F. Exit");
+
+        System.out.println("======================================== ");
+
+        Scanner s = new Scanner(System.in);
+        char ch = 0; // it is initialized as 0 ,because in below loop if the user just click 'enter' without any input then it caught in
+                     // "if condition" and the do loop ends when it stricks continue option which is in "if condition" and the
+                     // 'ch' wiil not be initialized
+
+        do{
+            System.out.print("Enter the character : ");
+            String input = s.nextLine().toUpperCase();
+
+            if(input.isEmpty()) {
+                System.out.println("Invalid option!");
+                continue;
+            }
+            ch = input.charAt(0);
+
+            switch(ch) {
+                case 'A':
+                    System.out.println("Balance = " + getBalance());
+                    System.out.println("======================================== ");
+                    break;
+
+                case 'B':
+                    System.out.print("Enter the deposit amount : ");
+                    try {
+                        int amount = Integer.parseInt(s.nextLine());
+                        deposit(amount);
+                    } 
+                    catch(NumberFormatException e) {
+                        System.out.println("Enter only numbers......");
+                    }
+                    System.out.println("======================================== ");
+                    break;
+
+                case 'C':
+                    System.out.print("Enter the withdraw amount : ");
+                    try {
+                        int amount2 = Integer.parseInt(s.nextLine());
+                        withdraw(amount2);
+                    } 
+                    catch(NumberFormatException e) {
+                        System.out.println("Enter only numbers......");
+                    }
+                    catch(InsufficientBalanceException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    System.out.println("======================================== ");
+                    break;
+
+                case 'D':
+                    prevTransaction();
+                    System.out.println("======================================== ");
+                    break;
+
+                case 'E':
+                    System.out.println();
+                    showTransactionHistory();
+                    System.out.println("======================================== ");
+                    break;
+
+                case 'F':
+                    System.out.println("======================================== ");
+                    break;
+
+                default:
+                    System.out.println("Invalid option . please try again");
+            }
+        } while(ch != 'F');
+        System.out.println("Thanks for using our services!!! ");
+
+        s.close();
+    }
+}
+
+class Main {
+    public static void main(String[] args) {
+        BankAccount customer1 = new BankAccount("vishnu", "pas123");
+        customer1.showMenu();
+    }
+}
